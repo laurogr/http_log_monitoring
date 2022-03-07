@@ -6,15 +6,7 @@
 #include <vector>
 
 // https://httpd.apache.org/docs/2.4/logs.html
-
-void readHeader();
-
-void printDebug(std::vector<std::string>& vec) {
-  for (int i = 0; i < vec.size(); ++i) {
-    std::cout << vec[i] << " ";
-  }
-  std::cout << "\n";
-}
+// https://www.fluentcpp.com/2017/04/21/how-to-split-a-string-in-c/
 
 class Parser {
   static void parseString(const std::string& line,
@@ -43,45 +35,37 @@ class Parser {
     parseString(line, parsedResource, delimiter);
   }
 };
-// ingest level metrics
-
-struct field {
-  std::string name;
-  int index;
-  std::string value;
-};
-
-struct line {
-  std::vector<struct field> fields;
-};
 
 struct metrics {
   std::unordered_map<std::string, int> hashmap;
+  int countLines{0};
   long int start{0};
   int secondsRule;
   metrics(int secondsRule) : secondsRule{secondsRule} {}
 
   void updateMetrics(long int value, std::string section) {
-    if (start == 0)
-      this->start = value;
+    if (start == 0) this->start = value;
 
     if (this->hashmap.find(section) == this->hashmap.end())
       this->hashmap[section] = 1;
     else
       this->hashmap[section] += 1;
 
-    checkMetricsRule(value);
+    ++countLines;
+    resetMetrics(value);
   }
 
-  void checkMetricsRule(long int value) {
+  // Reset the metrics if the delta of time is bigger than the rule defined
+  void resetMetrics(long int value) {
     if ((value - this->start) > this->secondsRule) {
       this->start = 0;
-      saveMetrics(value);
+      printMetrics(value);
       this->hashmap.clear();
+      countLines = 0;
     }
   }
 
-  void saveMetrics(long int value) {
+  virtual void printMetrics(long int value) {
     std::cout << "Rule of " << secondsRule << " | " << value << " " << start
               << std::endl;
 
@@ -89,15 +73,38 @@ struct metrics {
       std::cout << val.first << " " << val.second << std::endl;
     }
   }
-
 };
 
 struct warning_metrics : metrics {
   int alertThreshold;
+  int lastCountLines;
+  //data structure (circular maybe, to save the metrics)
 
   warning_metrics(int secondsRule, int alertThreshold)
       : metrics(secondsRule), alertThreshold{alertThreshold} {}
 
+  void printMetrics(long value) override {
+    std::cout << "WARNINF METRICS : Rule of " << secondsRule << " | " << value << " " << start
+              << std::endl;
+
+    for (auto val : this->hashmap) {
+      std::cout << "WARNINF METRICS : " << val.first << " " << val.second << std::endl;
+    }
+
+    std::cout <<  "WARNINF METRICS : total of connections " << countLines << std::endl;
+    //10 requests per second
+    //average = countConnections();
+    alertThreshold = 120*10;
+    if(countLines > alertThreshold) {
+      auto msg = "High traffic generated an alert - hits = {value}, triggered at {time}";
+      std::cout << msg << std::endl;
+    }
+
+    if(lastCountLines > alertThreshold && countLines < alertThreshold)
+      std::cout << "ALL GOOD NOW" << std::endl;
+
+    lastCountLines = countLines;
+  }
 
 };
 
@@ -128,9 +135,8 @@ int main() {
   auto idxRequest = 4;
   auto timer = 0;
 
-  struct metrics crono {
-    60
-  };
+  //struct metrics crono(60);
+  struct warning_metrics crono(60,120);
 
   std::chrono::steady_clock::time_point begin =
       std::chrono::steady_clock::now();
@@ -146,6 +152,7 @@ int main() {
 
     timestamp = std::stol(parsedLine[idxTime]);
     crono.updateMetrics(timestamp, section);
+
     if (hashmap.find(section) == hashmap.end())
       hashmap[section] = 1;
     else
@@ -167,6 +174,16 @@ int main() {
 }
 
 /*
+
+
+void printDebug(std::vector<std::string>& vec) {
+  for (int i = 0; i < vec.size(); ++i) {
+    std::cout << vec[i] << " ";
+  }
+  std::cout << "\n";
+}
+
+
 int main() {
   std::string header;
   std::string line;
