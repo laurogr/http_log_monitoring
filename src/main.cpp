@@ -18,22 +18,32 @@ class Parser {
   }
 };
 
-struct new_metrics {
-  std::unordered_map<std::string, int> hashmap;
+struct requestSecond {
+  std::unordered_map<std::string, int> hashmapSection;
+  int count{0};
+};
+
+struct LogLines {
+  std::unordered_map<long int, struct requestSecond>
+      hashmap;  // every second will have an element
   int countLines{0};
   long int start{0};
   int duration;
 
-  explicit new_metrics(int duration) : duration{duration} {}
+  explicit LogLines(int duration) : duration{duration} {}
 
-  void updateMetrics(long int value, std::string section) {
-    if (start == 0) this->start = value;
+  void update(long int timestamp, std::string section) {
+    if (start == 0) this->start = timestamp;
 
-    if (this->hashmap.find(section) == this->hashmap.end())
-      this->hashmap[section] = 1;
-    else
-      this->hashmap[section] += 1;
-
+    if (this->hashmap.find(timestamp) == this->hashmap.end()) {
+      struct requestSecond req;
+      req.count = 1;
+      req.hashmapSection[section] = 1;
+      this->hashmap[timestamp] = std::move(req);
+    } else {
+      this->hashmap[timestamp].count += 1;
+      this->hashmap[timestamp].hashmapSection[section] += 1;
+    }
     ++countLines;
   }
 
@@ -42,13 +52,138 @@ struct new_metrics {
   int getDuration() { return this->duration; }
 
   int getCountLines() { return this->countLines; }
-
-  void resetMetrics() {
-    this->start = 0;
-    this->hashmap.clear();
-    countLines = 0;
-  }
 };
+
+/*
+void alert2min() {
+  int eventCounter = 0;
+  max_timestamp = (max_timestamp > timestamp)
+                      ? max_timestamp
+                      : timestamp;  // bug unordered log lines
+
+ //sum of evenst for each second in the period
+  for (int i = max_timestamp - 120; i < max_timestamp; ++i) {
+    if (logLine.hashmap.find(i) != logLine.hashmap.end()) {
+      eventCounter += logLine.hashmap[i].count;
+    }
+  }
+
+  //if it tis bigger than the threshold
+  if (eventCounter >= 1200 && !hightraffic) {
+    if (alertmap.find(timestamp) == alertmap.end()) {
+      std::cout << "high traffic : " << eventCounter
+                << " problem at : " << timestamp << std::endl;
+      hightraffic = true;
+      alertmap[timestamp] = true;
+    }
+  }
+
+  if (hightraffic && eventCounter < 1200) {
+    std::cout << "normal traffic : " << eventCounter << " recovered at : "
+              << " " << timestamp << std::endl;
+    hightraffic = false;
+  }
+}
+*/
+
+// vector of alerts
+
+int main() {
+  std::ifstream myFile(
+      "/Users/lauro/Documents/workspace/http_log_monitoring/src/"
+      "sample_csv.txt");
+
+  // variables
+  std::string line;
+  std::string header;
+  std::vector<std::string> parsedLine;
+  std::string request;
+  std::string resource;
+  std::string section;
+  long int timestamp;
+  struct LogLines logLine(60);
+
+  // readHeader
+  getline(myFile, header);
+  auto idxTime = 3;
+  auto idxRequest = 4;
+  std::unordered_multimap<int, std::string> myMultimap;
+
+  std::unordered_map<int, int> ct;
+  int lastTimeStamp;
+
+  bool hightraffic = false;
+  std::unordered_map<int, bool> alertmap;
+  std::unordered_map<int, bool> alertmap10s;
+  int max_timestamp = 0;
+
+  while (getline(myFile, line)) {
+    Parser::parseString(line, parsedLine, ',');
+    timestamp = std::stol(parsedLine[idxTime]);
+    request = std::move(parsedLine[idxRequest]);
+
+    logLine.update(timestamp, request);
+
+    // loop to check the alerts (could be another thread)
+
+    // ****************** ALERT 10s  ******************
+    // set lastTimestap, when it is greater than 10 or here, just to % 10
+    int myCount = 0;
+    if (timestamp % 10 == 0) {
+      if (alertmap.find(timestamp) == alertmap.end()) {
+        for (int i = timestamp - 10; i < timestamp; ++i) {
+          myCount += logLine.hashmap[i].count;
+          for (auto section : logLine.hashmap[i].hashmapSection) {
+            // std::cout << "timestamp : " << i << " " << section.first << " "
+            // << section.second << std::endl;
+          }
+        }
+        alertmap[timestamp] = true;
+        std::cout << "INFO : " << myCount << " connections between " << timestamp - 10
+                  << " et " << timestamp  << std::endl;
+      }
+    }
+
+    // ****************** ALERT 2 MIN ******************
+
+    // ****************** ALERT 2 MIN ******************
+
+    //}
+
+    /*
+    auto val = timestamp % 120;
+    if( val == 0 && timestamp != lastTimeStamp) {
+      lastTimeStamp = timestamp;
+      std::cout << "timestamp = " << timestamp << std::endl;
+
+      int events = 0;
+      for(int i = timestamp - 120; i < timestamp; ++i) {
+        if(logLine.hashmap.find(i) != logLine.hashmap.end()) {
+          events += logLine.hashmap[i].count;
+        }
+      }
+      std::cout << "events timestamp -120 " << (timestamp - 120) << " a
+    timestamp " << timestamp << " events : "<< events << std::endl; if(events >
+    1200) std::cout << "high traffic" << std::endl;
+    }*/
+  }
+
+  /*for(auto v : ct) {
+    std::cout << v.first << " " << v.second << std::endl;
+  }*/
+
+  /*
+  for(auto v : logLine.hashmap) {
+    std::cout << v.first << " " << v.second.count << "\n";
+    for(auto section : v.second.hashmapSection) {
+      std::cout << section.first << " " << section.second <<"\n";
+    }
+  }*/
+
+  // 1549573860
+
+  return 0;
+}
 
 struct Alert {
   int threshold;
@@ -56,18 +191,17 @@ struct Alert {
 
   Alert(int threshold) : threshold{threshold} {}
 
-  bool isThresholdReached(struct new_metrics m, int currentTime) {
+  bool isThresholdReached(struct LogLines m, int currentTime) {
     return ((currentTime - m.getStart()) > m.getDuration());
   }
 
-  void countOcurrences(struct new_metrics m) {
-    for(const auto val : m.hashmap) {
-      std::cout << val.first << " " << val.second << std::endl;
+  void countOcurrences(struct LogLines m) {
+    for (const auto val : m.hashmap) {
+      std::cout << val.first << " " << val.second.count << std::endl;
     }
-
   }
 
-  void generateAlert(struct new_metrics m, int currentTime) {
+  void generateAlert(struct LogLines m, int currentTime) {
     std::cout << "Rule of " << m.getDuration() << " | " << currentTime << " "
               << m.getStart() << " Number of events : " << m.getCountLines()
               << std::endl;
@@ -87,75 +221,29 @@ struct Alert {
   }
 };
 
-int main() {
-  std::ifstream myFile(
-      "/Users/lauro/Documents/workspace/http_log_monitoring/src/"
-      "sample_csv.txt");
-
-  //variables
-  std::string line;
-  std::string header;
-  std::vector<std::string> parsedLine;
-  std::string request;
-  long int timestamp;
-  struct new_metrics crono(60);
-  struct Alert alert {10 * 120}; // 10 requests per second, 2min
-
-  // readHeader
-  getline(myFile, header);
-  auto idxTime = 3;
-  auto idxRequest = 4;
-  std::unordered_multimap<int,std::string> myMultimap;
-
-  while (getline(myFile, line)) {
-    Parser::parseString(line, parsedLine,',');
-    timestamp = std::stol(parsedLine[idxTime]);
-    request = std::move(parsedLine[idxRequest]);
+/*
+ *
 
 
-    myMultimap.insert({timestamp,request});
-
-
-    crono.updateMetrics(timestamp, request);
-
-    if (alert.isThresholdReached(crono, timestamp)) {
-      alert.generateAlert(crono, timestamp);
-      crono.resetMetrics();
-    }
-  }
   std::cout << "multimap size " << myMultimap.size() << std::endl;
   auto range = myMultimap.equal_range(1549573860);
 
-  for_each (
-      range.first,
-      range.second,
-      [](std::unordered_multimap<int,std::string> ::value_type& x){std::cout << " " << x.second;}
-  );
-
-  //1549573860
-
-  /*
-  for(auto v : myMultimap) {
-
-  }*/
-
-  return 0;
-}
+for_each (
+    range.first,
+    range.second,
+    [](std::unordered_multimap<int,std::string> ::value_type& x){std::cout << "
+" << x.second;}
+);
 
 
+ * */
+// std::chrono::steady_clock::time_point begin =
+//     std::chrono::steady_clock::now();
 
-
-//std::chrono::steady_clock::time_point begin =
-//    std::chrono::steady_clock::now();
-
-
-//Parser::parseRequest(parsedLine[idxRequest], parsedRequest);
-//resource = std::move(parsedRequest[1]);
-//Parser::parseResource(resource, parsedResources);
-//section = std::move(parsedResources[1]);
-
-
-
+// Parser::parseRequest(parsedLine[idxRequest], parsedRequest);
+// resource = std::move(parsedRequest[1]);
+// Parser::parseResource(resource, parsedResources);
+// section = std::move(parsedResources[1]);
 
 /*
 
@@ -179,9 +267,6 @@ static void parseResource(const std::string& line,
 
 
  * */
-
-
-
 
 struct metrics {
   std::unordered_map<std::string, int> hashmap;
