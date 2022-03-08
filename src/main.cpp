@@ -18,13 +18,9 @@ class Parser {
   }
 };
 
-struct requestSecond {
-  std::unordered_map<std::string, int> hashmapSection;
-  int count{0};
-};
 
 struct LogLines {
-  std::unordered_map<long int, struct requestSecond>
+  std::unordered_map<long int, std::vector<std::string>>
       hashmap;  // every second will have an element
   int countLines{0};
   long int start{0};
@@ -35,23 +31,19 @@ struct LogLines {
   void update(long int timestamp, std::string section) {
     if (start == 0) this->start = timestamp;
 
-    if (this->hashmap.find(timestamp) == this->hashmap.end()) {
-      struct requestSecond req;
-      req.count = 1;
-      req.hashmapSection[section] = 1;
-      this->hashmap[timestamp] = std::move(req);
-    } else {
-      this->hashmap[timestamp].count += 1;
-      this->hashmap[timestamp].hashmapSection[section] += 1;
-    }
+    if (this->hashmap.find(timestamp) == this->hashmap.end())
+      this->hashmap[timestamp] = std::move(std::vector<std::string>{section});
+    else
+      this->hashmap[timestamp].push_back(section);
+
     ++countLines;
   }
 
-  int getStart() { return this->start; }
+  long int getStart() const { return this->start; }
 
-  int getDuration() { return this->duration; }
+  int getDuration() const { return this->duration; }
 
-  int getCountLines() { return this->countLines; }
+  int getCountLines() const { return this->countLines; }
 };
 
 /*
@@ -88,10 +80,15 @@ void alert2min() {
 
 // vector of alerts
 
+struct req {
+  std::string httpMethod;
+  std::string resource;
+};
+
 int main() {
   std::ifstream myFile(
       "/Users/lauro/Documents/workspace/http_log_monitoring/src/"
-      "sample_csv.txt");
+      "sample_small.txt");
 
   // variables
   std::string line;
@@ -131,12 +128,15 @@ int main() {
     int myCount = 0;
     if (timestamp % 10 == 0) {
       if (alertmap.find(timestamp) == alertmap.end()) {
-        for (int i = timestamp - 10; i < timestamp; ++i) {
-          myCount += logLine.hashmap[i].count;
-          for (auto section : logLine.hashmap[i].hashmapSection) {
-            // std::cout << "timestamp : " << i << " " << section.first << " "
-            // << section.second << std::endl;
-          }
+        std::unordered_map<std::string,int> sectionCounter;
+
+        for (int i = timestamp - 10; i < timestamp; ++i) { //looping all the seconds here
+          myCount += logLine.hashmap[i].size(); //getting the number of connection int 10s windows
+
+          //for (auto section : logLine.hashmap[i]) { //parse the section
+          //  std::cout << section << std::endl;
+          //}
+
         }
         alertmap[timestamp] = true;
         std::cout << "INFO : " << myCount << " connections between " << timestamp - 10
@@ -197,7 +197,7 @@ struct Alert {
 
   void countOcurrences(struct LogLines m) {
     for (const auto val : m.hashmap) {
-      std::cout << val.first << " " << val.second.count << std::endl;
+      //std::cout << val.first << " " << val.second.count << std::endl;
     }
   }
 
