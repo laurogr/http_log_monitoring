@@ -83,8 +83,8 @@ class AlertRecurrent : public Alert {
                   const std::string& msg) override {
     // TODO : use string builder
     std::cout << "[" << getReadableFormatTime(timestamp)
-              << "][recurrent] # connections "
-              << ": " << msg << "\n";
+              << "][recurrent] # connections in the last " << recurrence
+              << " seconds : " << msg << "\n";
 
     // TODO : WIP, check below
     printConnectionInformation(logBuffer, timestamp);

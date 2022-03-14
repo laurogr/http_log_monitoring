@@ -50,4 +50,5 @@
   - mkdir build ; cd build ; cmake ../ ; make
   - Running executable : ./http_log_monitoring
   - Running tests : ./Google_Tests_run
+  - You can find an example of output of the sample here : doc/ouput_example.txt
 
