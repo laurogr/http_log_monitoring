@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 
 using LogBuffer = struct LogBuffer;
 
@@ -13,11 +14,11 @@ class LineBuffer {
     count = 1;
   }
 
-  void add(std::string&& section) {
-    if (this->hashmapRequests.find(section) == this->hashmapRequests.end()) {
-      hashmapRequests[section] = 1;
+  void add(std::string&& resource) {
+    if (this->hashmapRequests.find(resource) == this->hashmapRequests.end()) {
+      hashmapRequests[resource] = 1;
     } else {
-      hashmapRequests[section] += 1;
+      hashmapRequests[resource] += 1;
     }
     ++count;  // total count of connection for this specific second
   }
@@ -43,9 +44,9 @@ class LogBuffer {
     hashmapLinesSeconds.reserve(sizeInSeconds);
   }
 
-  void update(long int timestamp, std::string&& section) {
+  void update(long int timestamp, std::string&& resource) {
     erase(timestamp);
-    add(timestamp, std::move(section));
+    add(timestamp, std::move(resource));
     ++numberOfConnections;
     averageConnectionsPerSecond =
         numberOfConnections / hashmapLinesSeconds.size();

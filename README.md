@@ -31,6 +31,7 @@
 
 
 ### Improvements/Limitations:
+  - Add unit tests and integration tests : due the lack of available time, there are just few testcases
   - I did not consider a change of the header in terms of format and order
   - I did not check for possible errors in the input file
   - Instead of reading the line and parsing the content, read the words and place them in a new object directly to avoid going through the string again (even though c++ probably won't struggle with it)
@@ -39,10 +40,14 @@
     - Another solution could be : for each alarm, we would have a buffer (based on the size of the alarm), but it would cost extra space and time to copy to all of them
   - The analysis of the requests/sections should be done in a more intelligent way. I did not finish it but in my solution we should iterate a lot, I would need to think for a better solution on this one.
   - The Alert logic is based on states (hightraffic and normal traffic), I used an if, in this small program it is ok, but I guess if we wanted to expand would be better to think about a good desing pattern to avoid a lot of if's
+  - Increase the test coverage and its scope
 
 
 #### p.s.: to make it simple, I just created .h files in the cpp project
 
 ## How to run the program
-  - Add the home of boost and google test to the cmakefile
+  - Add the home of boost and google test to the cmakefile (ThirdPartyInc_DIR and ThirdPartyLib_DIR)
+  - mkdir build ; cd build ; cmake ../ ; make
+  - Running executable : ./http_log_monitoring
+  - Running tests : ./Google_Tests_run
 

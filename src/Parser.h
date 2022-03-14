@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/algorithm/string.hpp>
+
 //struct representing the log line, currently using only two values
 struct Line {
   std::string remotehost;
@@ -15,7 +17,7 @@ struct Line {
 class Parser {
  public:
   //TODO : improve parsing strategy
-  static std::string parseSectionFromRequest(const std::string& resource) {
+  static std::string parseSectionFromResource(const std::string& resource) {
     std::vector<std::string> parsedString;
 
     //splitting resource: "GET /api/user HTTP/1.0" -> /api/user

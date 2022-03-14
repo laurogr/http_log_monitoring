@@ -115,7 +115,7 @@ class AlertRecurrent : public Alert {
     for (long int i = timestamp - recurrence; i < timestamp; ++i) {
       auto hash = logBuffer.getLineBuffer(i).getHashmapRequest();
       for (const auto& v : hash) {
-        auto section = Parser::parseSectionFromRequest(v.first);
+        auto section = Parser::parseSectionFromResource(v.first);
         if (sectionCounterHashmap.find(section) ==
             sectionCounterHashmap.end()) {
           sectionCounterHashmap[section] = v.second;
