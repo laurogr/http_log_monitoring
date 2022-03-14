@@ -1,0 +1,151 @@
+[2019-02-07 09:11:00 PM][recurrent] # connections : 0
+[2019-02-07 09:11:10 PM][recurrent] # connections : 80
+/api 53 - hits
+/report 27 - hits
+[2019-02-07 09:11:20 PM][recurrent] # connections : 82
+/api 56 - hits
+/report 26 - hits
+[2019-02-07 09:11:30 PM][recurrent] # connections : 93
+/report 31 - hits
+/api 62 - hits
+[2019-02-07 09:11:40 PM][recurrent] # connections : 89
+/report 30 - hits
+/api 59 - hits
+[2019-02-07 09:11:50 PM][recurrent] # connections : 85
+/report 26 - hits
+/api 59 - hits
+[2019-02-07 09:12:00 PM][recurrent] # connections : 86
+/report 29 - hits
+/api 57 - hits
+[2019-02-07 09:12:10 PM][recurrent] # connections : 161
+/report 26 - hits
+/api 135 - hits
+[2019-02-07 09:12:20 PM][recurrent] # connections : 167
+/api 140 - hits
+/report 27 - hits
+[2019-02-07 09:12:20 PM] High Traffic
+[2019-02-07 09:12:21 PM] Normal Traffic
+[2019-02-07 09:12:22 PM] High Traffic
+[2019-02-07 09:12:30 PM][recurrent] # connections : 164
+/report 27 - hits
+/api 137 - hits
+[2019-02-07 09:12:40 PM][recurrent] # connections : 171
+/report 26 - hits
+/api 145 - hits
+[2019-02-07 09:12:50 PM][recurrent] # connections : 157
+/api 132 - hits
+/report 25 - hits
+[2019-02-07 09:13:00 PM][recurrent] # connections : 174
+/api 147 - hits
+/report 27 - hits
+[2019-02-07 09:13:10 PM][recurrent] # connections : 30
+/report 10 - hits
+/api 20 - hits
+[2019-02-07 09:13:20 PM][recurrent] # connections : 30
+/api 20 - hits
+/report 10 - hits
+[2019-02-07 09:13:30 PM][recurrent] # connections : 30
+/api 20 - hits
+/report 10 - hits
+[2019-02-07 09:13:40 PM][recurrent] # connections : 28
+/report 9 - hits
+/api 19 - hits
+[2019-02-07 09:13:50 PM] Normal Traffic
+[2019-02-07 09:13:50 PM][recurrent] # connections : 31
+/api 21 - hits
+/report 10 - hits
+[2019-02-07 09:14:00 PM][recurrent] # connections : 30
+/report 10 - hits
+/api 20 - hits
+[2019-02-07 09:14:10 PM][recurrent] # connections : 26
+/report 9 - hits
+/api 17 - hits
+[2019-02-07 09:14:20 PM][recurrent] # connections : 28
+/report 9 - hits
+/api 19 - hits
+[2019-02-07 09:14:30 PM][recurrent] # connections : 30
+/api 20 - hits
+/report 10 - hits
+[2019-02-07 09:14:40 PM][recurrent] # connections : 30
+/api 20 - hits
+/report 10 - hits
+[2019-02-07 09:14:50 PM][recurrent] # connections : 29
+/report 9 - hits
+/api 20 - hits
+[2019-02-07 09:15:00 PM][recurrent] # connections : 30
+/report 9 - hits
+/api 21 - hits
+[2019-02-07 09:15:10 PM][recurrent] # connections : 30
+/api 20 - hits
+/report 10 - hits
+[2019-02-07 09:15:20 PM][recurrent] # connections : 28
+/api 19 - hits
+/report 9 - hits
+[2019-02-07 09:15:30 PM][recurrent] # connections : 30
+/report 10 - hits
+/api 20 - hits
+[2019-02-07 09:15:40 PM][recurrent] # connections : 252
+/api 225 - hits
+/report 27 - hits
+[2019-02-07 09:15:50 PM][recurrent] # connections : 252
+/api 225 - hits
+/report 27 - hits
+[2019-02-07 09:16:00 PM][recurrent] # connections : 252
+/report 27 - hits
+/api 225 - hits
+[2019-02-07 09:16:07 PM] High Traffic
+[2019-02-07 09:16:10 PM][recurrent] # connections : 252
+/api 225 - hits
+/report 27 - hits
+[2019-02-07 09:16:20 PM][recurrent] # connections : 253
+/report 28 - hits
+/api 225 - hits
+[2019-02-07 09:16:30 PM][recurrent] # connections : 253
+/api 226 - hits
+/report 27 - hits
+[2019-02-07 09:16:40 PM][recurrent] # connections : 257
+/report 27 - hits
+/api 230 - hits
+[2019-02-07 09:16:50 PM][recurrent] # connections : 276
+/api 249 - hits
+/report 27 - hits
+[2019-02-07 09:17:00 PM][recurrent] # connections : 250
+/report 27 - hits
+/api 223 - hits
+[2019-02-07 09:17:10 PM][recurrent] # connections : 26
+/api 16 - hits
+/report 10 - hits
+[2019-02-07 09:17:20 PM][recurrent] # connections : 18
+/report 9 - hits
+/api 9 - hits
+[2019-02-07 09:17:30 PM][recurrent] # connections : 20
+/report 9 - hits
+/api 11 - hits
+[2019-02-07 09:17:40 PM][recurrent] # connections : 18
+/report 9 - hits
+/api 9 - hits
+[2019-02-07 09:17:50 PM][recurrent] # connections : 22
+/report 10 - hits
+/api 12 - hits
+[2019-02-07 09:18:00 PM][recurrent] # connections : 19
+/api 9 - hits
+/report 10 - hits
+[2019-02-07 09:18:10 PM][recurrent] # connections : 20
+/api 10 - hits
+/report 10 - hits
+[2019-02-07 09:18:20 PM][recurrent] # connections : 20
+/report 10 - hits
+/api 10 - hits
+[2019-02-07 09:18:22 PM] Normal Traffic
+[2019-02-07 09:18:30 PM][recurrent] # connections : 19
+/report 9 - hits
+/api 10 - hits
+[2019-02-07 09:18:40 PM][recurrent] # connections : 21
+/report 11 - hits
+/api 10 - hits
+[2019-02-07 09:18:50 PM][recurrent] # connections : 19
+/report 9 - hits
+/api 10 - hits
+[2019-02-07 09:19:00 PM][recurrent] # connections : 19
+/report 9 - hits
+/api 10 - hits

@@ -2,6 +2,8 @@
 
 using LogBuffer = struct LogBuffer;
 
+// LineBuffer is going to store all the information in a specific second :
+// number of connections and all requests
 class LineBuffer {
  public:
   LineBuffer() = default;
@@ -22,11 +24,17 @@ class LineBuffer {
 
   [[nodiscard]] int getCount() const { return this->count; }
 
+  [[nodiscard]] std::unordered_map<std::string, int> getHashmapRequest() const {
+    return hashmapRequests;
+  }
+
+ private:
   std::unordered_map<std::string, int> hashmapRequests;
   int count{0};
 };
 
-class LogBuffer {  //'circular buffer' with a hashmap, only using sizeInSec
+// Buffer used to store all the lines using a hashmap (using timestamp as key)
+class LogBuffer {
  public:
   explicit LogBuffer(int sizeInSeconds)
       : sizeInSeconds{sizeInSeconds},
@@ -39,7 +47,8 @@ class LogBuffer {  //'circular buffer' with a hashmap, only using sizeInSec
     erase(timestamp);
     add(timestamp, std::move(section));
     ++numberOfConnections;
-    averageConnectionsPerSecond = numberOfConnections / hashmapLinesSeconds.size();
+    averageConnectionsPerSecond =
+        numberOfConnections / hashmapLinesSeconds.size();
   }
 
   [[nodiscard]] int getAverageConnections() const {
@@ -56,8 +65,7 @@ class LogBuffer {  //'circular buffer' with a hashmap, only using sizeInSec
  private:
   void add(long int timestamp, std::string&& section) {
     if (hashmapLinesSeconds.find(timestamp) == hashmapLinesSeconds.end())
-      hashmapLinesSeconds.insert(
-          {timestamp, LineBuffer{std::move(section)}});
+      hashmapLinesSeconds.insert({timestamp, LineBuffer{std::move(section)}});
     else
       hashmapLinesSeconds.at(timestamp).add(std::move(section));
   }

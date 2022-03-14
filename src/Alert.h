@@ -3,6 +3,7 @@
 #include "Buffer.h"
 #include "Parser.h"
 
+// Base class for 2 type of alerts
 class Alert {
  public:
   virtual void check(const struct LogBuffer& logBuffer, long int timestamp) = 0;
@@ -21,6 +22,7 @@ class Alert {
   long int lastAlertTimestamp{0};
 };
 
+// Alert Based on average numbers of connections per second.
 class AlertAverage : public Alert {
  private:
   enum class AlertStates { normalTraffic, highTraffic };
@@ -35,6 +37,9 @@ class AlertAverage : public Alert {
   // TODO : check design pattern to avoid if conditions on the state
   void check(const struct LogBuffer& logBuffer, long int timestamp) override {
     auto averageConnections = logBuffer.getAverageConnections();
+
+    // detecting high traffic: checking threshold, state and if is not a late
+    // timestamp already analyzed
     if (averageConnections > thresholdConnectionPerSecond &&
         alertState == AlertStates::normalTraffic &&
         timestamp > lastAlertTimestamp) {
@@ -43,6 +48,7 @@ class AlertAverage : public Alert {
       printAlert(logBuffer, timestamp, "High Traffic");
     }
 
+    // detecting normal traffic after a hightraffic event
     if (alertState == AlertStates::highTraffic &&
         averageConnections <= thresholdConnectionPerSecond &&
         timestamp > lastAlertTimestamp) {
@@ -59,11 +65,8 @@ class AlertAverage : public Alert {
   }
 };
 
+// Alert Based on recurrent time period, for instance, 10s
 class AlertRecurrent : public Alert {
- private:
-  std::unordered_map<long int, bool> checkedTimestamps;
-  int recurrence;
-
  public:
   explicit AlertRecurrent(int recurrence) : recurrence{recurrence} {}
   ~AlertRecurrent() override = default;
@@ -100,7 +103,7 @@ class AlertRecurrent : public Alert {
                                   long timestamp) const {
     auto map = getSectionCounterHashmap(logBuffer, timestamp);
     for (const auto& v : map)
-      std::cout << "/" << v.first << " " << v.second << std::endl;
+      std::cout << "/" << v.first << " " << v.second << " - hits\n";
   }
 
   // TODO : improve aggregation/calculation of information, simplify it
@@ -108,9 +111,9 @@ class AlertRecurrent : public Alert {
       const LogBuffer& logBuffer, long timestamp) const {
     std::unordered_map<std::string, int> sectionCounterHashmap;
 
-    //getting the information of each second and aggregating
+    // getting the information of each second and aggregating
     for (long int i = timestamp - recurrence; i < timestamp; ++i) {
-      auto hash = logBuffer.getLineBuffer(i).hashmapRequests;
+      auto hash = logBuffer.getLineBuffer(i).getHashmapRequest();
       for (const auto& v : hash) {
         auto section = Parser::parseSectionFromRequest(v.first);
         if (sectionCounterHashmap.find(section) ==
@@ -123,4 +126,8 @@ class AlertRecurrent : public Alert {
     }
     return sectionCounterHashmap;
   }
+
+ private:
+  std::unordered_map<long int, bool> checkedTimestamps;
+  int recurrence;
 };

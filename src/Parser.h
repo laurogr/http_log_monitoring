@@ -1,5 +1,6 @@
 #pragma once
 
+//struct representing the log line, currently using only two values
 struct Line {
   std::string remotehost;
   std::string rfc931;
@@ -10,53 +11,8 @@ struct Line {
   std::string bytes;
 };
 
-
+//class to parse all used string in the program
 class Parser {
- private:
-  enum headerIndex {
-    remotehost,
-    rfc931,
-    authuser,
-    date,
-    request,
-    status,
-    bytes
-  };
-
-  enum resourceIndex {
-    httpMethod,
-    section,
-    httpVersion
-  };
-
-  enum sectionIndex {
-    beforeSection,
-    mainSection,
-    subSection
-  };
-
-  static void parseLine(const std::string& line,
-                        std::vector<std::string>& parsedString,
-                        char delimiter = ',') {
-    boost::split(parsedString, line,
-                 [delimiter](char c) { return c == delimiter; });
-  }
-
-  static long int parseDate(std::vector<std::string>& parsedString) {
-    return std::stol(parsedString[headerIndex::date]);
-  }
-
-  static std::string parseRequest(std::vector<std::string>& parsedString) {
-    return parsedString[headerIndex::request];
-  }
-
-  static void parseString(const std::string& line,
-                          std::vector<std::string>& parsedString,
-                          char delimiter) {
-    boost::split(parsedString, line,
-                 [delimiter](char c) { return c == delimiter; });
-  }
-
  public:
   //TODO : improve parsing strategy
   static std::string parseSectionFromRequest(const std::string& resource) {
@@ -80,5 +36,51 @@ class Parser {
     retLine.request = std::move(Parser::parseRequest(parsedString));
 
     return retLine;
+  }
+
+ private:
+  enum headerIndex {
+    remotehost,
+    rfc931,
+    authuser,
+    date,
+    request,
+    status,
+    bytes
+  };
+
+  enum resourceIndex {
+    httpMethod,
+    section,
+    httpVersion
+  };
+
+  enum sectionIndex {
+    beforeSection,
+    mainSection,
+    subSection
+  };
+
+  //TODO : remove hardcoded chars
+  static void parseLine(const std::string& line,
+                        std::vector<std::string>& parsedString,
+                        char delimiter = ',') {
+    boost::split(parsedString, line,
+                 [delimiter](char c) { return c == delimiter; });
+  }
+
+  static long int parseDate(std::vector<std::string>& parsedString) {
+    return std::stol(parsedString[headerIndex::date]);
+  }
+
+  static std::string parseRequest(std::vector<std::string>& parsedString) {
+    return parsedString[headerIndex::request];
+  }
+
+  static void parseString(const std::string& line,
+                          std::vector<std::string>& parsedString,
+                          char delimiter) {
+    boost::split(parsedString, line,
+                 [delimiter](char c) { return c == delimiter; });
   }
 };
